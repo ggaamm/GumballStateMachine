@@ -73,25 +73,39 @@ final class GumballModel: ObservableObject {
     
     init() {
         actionPublisher
-            .sink { [self] action in
+            .sink { action in
                 let oldState = self.state.rawValue
-                if case GumballState.NoQuarter = self.state, action == .insertsQuarter {
-                    self.state = .HasQuarter
-                } else if case GumballState.HasQuarter = self.state, action == .turnCrank {
-                    self.state = .GumballSold
-                } else if case GumballState.HasQuarter = self.state, action == .ejectsQuarter {
-                    self.state = .NoQuarter
-                } else if case GumballState.GumballSold = self.state, action == .dispenseGumball, self.gumballs > 0  {
-                    self.state = .NoQuarter
-                    self.gumballs -= 1
-                    // gumball is dispensed
-                    print("Gumball is dispensed")
-                    print("Number of Gumballs: \(self.gumballs)")
-                } else if case GumballState.GumballSold = self.state, action == .dispenseGumball, self.gumballs == 0  {
-                    self.state = .OutOfGumballs
-                } else if case GumballState.OutOfGumballs = self.state, action == .loadGumballs, self.gumballs > 0 {
-                    self.state = .NoQuarter
+                
+                switch self.state {
+                case .NoQuarter:
+                    if action == .insertsQuarter {
+                        self.state = .HasQuarter
+                    }
+                case .HasQuarter:
+                    if action == .turnCrank {
+                        self.state = .GumballSold
+                    } else if action == .ejectsQuarter {
+                        self.state = .NoQuarter
+                    }
+                case .GumballSold:
+                    if action == .dispenseGumball {
+                        if self.gumballs > 0 {
+                            self.state = .NoQuarter
+                            self.gumballs -= 1
+                        // gumball is dispensed
+                            print("Gumball is dispensed")
+                            print("Number of Gumballs: \(self.gumballs)")
+                        } else {
+                            self.state = .OutOfGumballs
+                        }
+                    }
+                case .OutOfGumballs:
+                    if action == .loadGumballs && self.gumballs > 0 {
+                        self.state = .NoQuarter
+                        self.state = .NoQuarter
+                    }
                 }
+
                 let newState = self.state.rawValue
                 print("Old State: ", oldState, " New State: ", newState)
                 self.currentState = String(describing: self.state.description)
