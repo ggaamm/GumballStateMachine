@@ -81,14 +81,15 @@ final class GumballModel: ObservableObject {
                     self.state = .GumballSold
                 } else if case GumballState.HasQuarter = self.state, action == .ejectsQuarter {
                     self.state = .NoQuarter
-                } else if case GumballState.GumballSold = self.state, action == .dispenseGumball, self.gumballs > 0  {
-                    self.state = .NoQuarter
+                } else if case GumballState.GumballSold = self.state, action == .dispenseGumball {
                     self.gumballs -= 1
-                    // gumball is dispensed
-                    print("Gumball is dispensed")
-                    print("Number of Gumballs: \(self.gumballs)")
-                } else if case GumballState.GumballSold = self.state, action == .dispenseGumball, self.gumballs == 0  {
-                    self.state = .OutOfGumballs
+                    if self.gumballs > 0 {
+                        self.state = .NoQuarter
+                        print("Gumball is dispensed")
+                        print("Number of Gumballs: \(self.gumballs)")
+                    } else {
+                        self.state = .OutOfGumballs
+                    }
                 } else if case GumballState.OutOfGumballs = self.state, action == .loadGumballs, self.gumballs > 0 {
                     self.state = .NoQuarter
                 }
