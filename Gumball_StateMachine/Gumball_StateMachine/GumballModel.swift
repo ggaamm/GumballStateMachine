@@ -89,9 +89,9 @@ final class GumballModel: ObservableObject {
                     }
                 case .GumballSold:
                     if action == .dispenseGumball {
+                        self.gumballs -= 1
                         if self.gumballs > 0 {
                             self.state = .NoQuarter
-                            self.gumballs -= 1
                         // gumball is dispensed
                             print("Gumball is dispensed")
                             print("Number of Gumballs: \(self.gumballs)")
